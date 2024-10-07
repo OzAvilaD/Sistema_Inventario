@@ -7,7 +7,11 @@ package GUI;
 import Cita.Cita;
 import Metodos.Metodos;
 import com.mycompany.evaluacion.Principal;
+import java.awt.JobAttributes;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.Vector;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -20,6 +24,9 @@ public class Modificar extends javax.swing.JFrame {
     Metodos metodos = new Metodos();
     DefaultTableModel Tabla;
     Vector VCabeceras = new Vector();
+    
+    int filas;
+    
 
     /**
      * Creates new form Modificar
@@ -28,14 +35,6 @@ public class Modificar extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         
-        
-        
-        VCabeceras.addElement("Nombre");
-        VCabeceras.addElement("Fecha");
-        VCabeceras.addElement("Motivo");
-        VCabeceras.addElement("Descripcion");
-        Tabla = new DefaultTableModel(VCabeceras, 0);
-        jTable1.setModel(Tabla);
         jTable1.setModel(metodos.listaCitas());
     }
 
@@ -76,6 +75,11 @@ public class Modificar extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         jLabel1.setText("Nombre:");
@@ -179,9 +183,56 @@ public class Modificar extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        String []data = new String[4];
+        data[0]=jTextField1.getText();
+        data[1]=jTextField2.getText();
+        data[2]=jTextField3.getText();
+        data[3]=jTextField4.getText();
+        
+        for (int k = 0; k < jTable1.getColumnCount(); k++) {
+            jTable1.setValueAt(data[k], filas, k);
+        }
+        
+        try {
+            String archi = "Citas.txt";
+            BufferedWriter bw = new BufferedWriter(new FileWriter(archi));
+            for (int i = 0; i < jTable1.getRowCount(); i++) {
+                for (int j = 0; j < jTable1.getColumnCount(); j++) {
+                    bw.write((String)(jTable1.getValueAt(i, j)));
+                    
+                    if (j<jTable1.getColumnCount()-1) {
+                        bw.write("|");
+                    }
+                }
+                bw.newLine();                
+            }
+            bw.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        
+        JOptionPane.showMessageDialog(null,"Cita Actualizada");
+        
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");
         
         jTable1.setModel(metodos.listaCitas());
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+        this.Tabla = (DefaultTableModel) jTable1.getModel();
+        
+        int selected = jTable1.getSelectedRow();
+        jTextField1.setText(jTable1.getValueAt(selected, 0).toString());
+        jTextField2.setText(jTable1.getValueAt(selected, 1).toString());
+        jTextField3.setText(jTable1.getValueAt(selected, 2).toString());
+        jTextField4.setText(jTable1.getValueAt(selected, 3).toString());
+        
+        filas = selected;
+    }//GEN-LAST:event_jTable1MouseClicked
 
     /**
      * @param args the command line arguments
